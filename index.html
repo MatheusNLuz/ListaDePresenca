@@ -1,240 +1,78 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>Confirmar Presença</title>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- Tailwind CSS via CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- DaisyUI via CDN -->
-    <link href="https://cdn.jsdelivr.net/npm/daisyui@3.7.3/dist/full.css" rel="stylesheet" type="text/css" />
-  </head>
-  <body class="bg-gray-900 flex flex-col items-center justify-center min-h-screen p-4">
-    <!-- Título fora da caixa central -->
-    <h1 class="text-3xl font-bold text-gray-100 mb-8 text-center">Lucca ou Sophia - Chá Revelação</h1>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lista de Presença</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <link rel="shortcut icon" href="assets/logo.png" type="image/x-icon">
+  <style>
+    /* Estilo do spinner com gradiente apenas na borda */
+    .spinner {
+      border: 4px solid transparent;
+      border-top: 4px solid #F8A7FF;
+      border-right: 4px solid #99D8FF;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+    }
 
-    <!-- Caixa central -->
-    <div class="bg-gray-800 p-6 rounded-lg shadow-sm w-full max-w-md border border-gray-700">
-      <h2 class="text-xl font-semibold text-center mb-6 text-gray-100">Confirmar Presença</h2>
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-r to-[#99D8FF] from-[#F8A7FF] flex justify-center items-center min-h-screen">
 
-      <!-- Botões de Autorização -->
-      <div class="text-center mb-6">
-        <button id="authorize_button" onclick="handleAuthClick()" class="btn bg-blue-600 text-white hover:bg-blue-700 border-none px-6 py-3 rounded-full">Autorizar</button>
-        <button id="signout_button" onclick="handleSignoutClick()" class="btn btn-ghost text-gray-300 ml-2 px-6 py-3 rounded-full">Sair</button>
+  <!-- Formulário -->
+  <div class="m-4 lg:m-0 max-w-md w-full bg-white dark:bg-gray-700 p-6 rounded-lg shadow-lg space-y-6">
+    <h1 class="text-3xl font-semibold text-center text-gray-800 dark:text-white">Confirme sua Presença</h1>
+
+    <form id="presencaForm">
+      <div class="mb-4">
+        <label for="nome" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Seu Nome</label>
+        <input type="text" id="nome" name="nome" class="input input-bordered w-full p-3 rounded-md" required>
       </div>
 
-      <!-- Formulário para Confirmar Presença -->
-      <div id="editForm" style="display: none;">
-        <div class="form-control">
-          <label for="nome" class="label text-gray-300">Digite seu nome:</label>
-          <input type="text" id="nome" placeholder="Ex: Matheus" class="input input-bordered w-full bg-gray-700 text-gray-100 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-all rounded-lg px-4 py-3" required>
-        </div>
-        <div class="form-control mt-4">
-          <label for="confirmacao" class="label text-gray-300">Você confirma sua presença?</label>
-          <select id="confirmacao" class="select select-bordered w-full bg-gray-700 text-gray-100 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-all rounded-lg px-4 py-3" required>
-            <option value="Sim">Sim</option>
-            <option value="Não">Não</option>
-          </select>
-        </div>
-        <button onclick="updateSheet()" class="btn bg-blue-600 text-white hover:bg-blue-700 border-none w-full mt-6 px-6 py-3 rounded-full">Confirmar</button>
+      <div class="mb-4">
+        <label for="confirmar" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Confirma Presença?</label>
+        <select id="confirmar" name="confirmar" class="select select-bordered w-full p-3 rounded-md" required>
+          <option value="" disabled selected>Selecione</option>
+          <option value="Sim">Sim</option>
+          <option value="Não">Não</option>
+        </select>
       </div>
+
+      <button type="submit" class="btn bg-gradient-to-r to-[#99D8FF] from-[#F8A7FF] text-white w-full p-3 rounded-md transition duration-150 ease-in-out transform active:scale-95 hover:scale-95">Confirmar</button>
+    </form>
+  </div>
+
+  <!-- Modal de Sucesso -->
+  <div id="modalSuccess" class="fixed inset-0 flex items-center justify-center z-50 hidden">
+    <div class="bg-gray-800 text-white p-6 rounded-lg shadow-lg w-full max-w-md text-center">
+      <h2 class="text-xl font-semibold">Presença Confirmada!</h2>
+      <p class="mt-2">Seu registro foi enviado com sucesso.</p>
+      <button onclick="closeModal('modalSuccess')" class="mt-4 bg-gray-700 px-4 py-2 rounded-md hover:bg-gray-600">Fechar</button>
     </div>
+  </div>
 
-    <!-- Modal de Sucesso -->
-    <div id="successModal" class="modal">
-      <div class="modal-box bg-gray-800 border border-gray-700">
-        <h3 class="font-bold text-lg text-gray-100">Sucesso!</h3>
-        <p class="py-4 text-gray-300">Presença confirmada com sucesso!</p>
-        <div class="modal-action">
-          <button onclick="closeModal()" class="btn bg-blue-600 text-white hover:bg-blue-700 border-none px-6 py-3 rounded-full">Fechar</button>
-        </div>
-      </div>
+  <!-- Modal de Erro -->
+  <div id="modalError" class="fixed inset-0 flex items-center justify-center z-50 hidden">
+    <div class="bg-gray-800 text-white p-6 rounded-lg shadow-lg w-full max-w-md text-center">
+      <h2 class="text-xl font-semibold">Erro!</h2>
+      <p class="mt-2">Ocorreu um erro ao enviar os dados. Tente novamente.</p>
+      <button onclick="closeModal('modalError')" class="mt-4 bg-red-800 px-4 py-2 rounded-md hover:bg-red-700">Fechar</button>
     </div>
-    <!-- Modal de Error -->
-    <div id="errorModal" class="modal">
-      <div class="modal-box bg-gray-800 border border-gray-700">
-        <h3 class="font-bold text-lg text-gray-100">Error!</h3>
-        <p class="py-4 text-gray-300">Um erro aconteceu, por favor tente novamente depois</p>
-        <div class="modal-action">
-          <button onclick="closeModal()" class="btn bg-blue-600 text-white hover:bg-blue-700 border-none px-6 py-3 rounded-full">Fechar</button>
-        </div>
-      </div>
-    </div>
+  </div>
 
-    <script type="text/javascript">
-      // Substitua pelo seu CLIENT_ID e API_KEY
-      const CLIENT_ID = '239786493927-14ukrt37jeqglgekpn8trl3h5tlgdgmd.apps.googleusercontent.com';
-      const API_KEY = 'AIzaSyC48Bcqab_NVFT3KZIu0yn_sQ1CxoYFs_U';
+  <!-- Loading Spinner (Manual) -->
+  <div id="loadingSpinner" class="fixed inset-0 flex items-center justify-center z-50 hidden">
+    <div class="spinner"></div>
+  </div>
 
-      // ID da Planilha (substitua pelo ID da sua planilha)
-      const SPREADSHEET_ID = '1A_7BVF-Tgm93LXdz6DPcwELgPqoag011ddd5rRGzqTQ';
-
-      // Escopo para leitura e escrita
-      const SCOPES = 'https://www.googleapis.com/auth/spreadsheets';
-
-      // URLs da API
-      const DISCOVERY_DOC = 'https://sheets.googleapis.com/$discovery/rest?version=v4';
-
-      let tokenClient;
-      let gapiInited = false;
-      let gisInited = false;
-
-      // Inicializa os botões
-      document.getElementById('authorize_button').style.visibility = 'hidden';
-      document.getElementById('signout_button').style.visibility = 'hidden';
-
-      /**
-       * Carrega a API do Google.
-       */
-      function gapiLoaded() {
-        gapi.load('client', initializeGapiClient);
-      }
-
-      /**
-       * Inicializa o cliente da API.
-       */
-      async function initializeGapiClient() {
-        await gapi.client.init({
-          apiKey: API_KEY,
-          discoveryDocs: [DISCOVERY_DOC],
-        });
-        gapiInited = true;
-        maybeEnableButtons();
-      }
-
-      /**
-       * Carrega a biblioteca de autenticação do Google.
-       */
-      function gisLoaded() {
-        tokenClient = google.accounts.oauth2.initTokenClient({
-          client_id: CLIENT_ID,
-          scope: SCOPES,
-          callback: '', // Definido posteriormente
-        });
-        gisInited = true;
-        maybeEnableButtons();
-      }
-
-      /**
-       * Habilita os botões após carregar as bibliotecas.
-       */
-      function maybeEnableButtons() {
-        if (gapiInited && gisInited) {
-          document.getElementById('authorize_button').style.visibility = 'visible';
-        }
-      }
-
-      /**
-       * Autoriza o usuário.
-       */
-      function handleAuthClick() {
-        tokenClient.callback = async (resp) => {
-          if (resp.error !== undefined) {
-            throw resp;
-          }
-          document.getElementById('signout_button').style.visibility = 'visible';
-          document.getElementById('authorize_button').innerText = 'Atualizar Token';
-          document.getElementById('editForm').style.display = 'block';
-        };
-
-        if (gapi.client.getToken() === null) {
-          tokenClient.requestAccessToken({ prompt: 'consent' });
-        } else {
-          tokenClient.requestAccessToken({ prompt: '' });
-        }
-      }
-
-      /**
-       * Desconecta o usuário.
-       */
-      function handleSignoutClick() {
-        const token = gapi.client.getToken();
-        if (token !== null) {
-          google.accounts.oauth2.revoke(token.access_token);
-          gapi.client.setToken('');
-          document.getElementById('authorize_button').innerText = 'Autorizar';
-          document.getElementById('signout_button').style.visibility = 'hidden';
-          document.getElementById('editForm').style.display = 'none';
-        }
-      }
-
-      /**
-       * Adiciona ou atualiza a confirmação na planilha.
-       */
-      async function updateSheet() {
-        const nome = document.getElementById('nome').value; // Ex: Matheus
-        const confirmacao = document.getElementById('confirmacao').value; // Ex: Sim
-
-        try {
-
-            if(!nome) {
-                throw("Você tem que preencher o seu nome para poder salvar!")
-            }
-          // Passo 1: Ler a planilha para verificar se o nome já existe
-          const response = await gapi.client.sheets.spreadsheets.values.get({
-            spreadsheetId: SPREADSHEET_ID,
-            range: 'A2:B', // Lê todas as linhas das colunas A e B
-          });
-
-          const values = response.result.values || [];
-          let rowIndex = -1;
-
-          // Passo 2: Verificar se o nome já existe
-          for (let i = 0; i < values.length; i++) {
-            if (values[i][0] === nome) {
-              rowIndex = i + 2; // Adiciona 2 porque a planilha começa na linha 2 (A2)
-              break;
-            }
-          }
-
-          // Passo 3: Atualizar ou adicionar o nome
-          if (rowIndex !== -1) {
-            // Atualiza a confirmação se o nome já existir
-            const range = `B${rowIndex}`; // Ex: B2, B3, etc.
-            await gapi.client.sheets.spreadsheets.values.update({
-              spreadsheetId: SPREADSHEET_ID,
-              range: range,
-              valueInputOption: 'RAW',
-              resource: {
-                values: [[confirmacao]], // Valor a ser inserido
-              },
-            });
-          } else {
-            // Adiciona uma nova linha se o nome não existir
-            await gapi.client.sheets.spreadsheets.values.append({
-              spreadsheetId: SPREADSHEET_ID,
-              range: 'A2:B', // Adiciona na próxima linha disponível
-              valueInputOption: 'RAW',
-              resource: {
-                values: [[nome, confirmacao]], // Nome e confirmação
-              },
-            });
-          }
-
-          // Exibe a modal de sucesso
-          document.getElementById('successModal').classList.add('modal-open');
-        } catch (err) {
-          console.log(err);
-          document.getElementById('errorModal').classList.add('modal-open');
-
-        }
-      }
-
-      /**
-       * Fecha a modal de sucesso.
-       */
-      function closeModal() {
-        const error = document.getElementById('errorModal');
-        const success = document.getElementById('successModal');
-        if(error || success) {
-            error.classList.remove('modal-open');
-            success.classList.remove('modal-open');
-           
-        }
-        
-      }
-    </script>
-    <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
-    <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
-  </body>
+  <script src="assets/cadastrar.js"></script>
+</body>
 </html>
