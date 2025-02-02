@@ -214,7 +214,8 @@
           // Exibe a modal de sucesso
           document.getElementById('successModal').classList.add('modal-open');
         } catch (err) {
-            document.getElementById('errorModal').classList.add('modal-open');
+          console.log(err);
+          document.getElementById('errorModal').classList.add('modal-open');
 
         }
       }
@@ -228,7 +229,7 @@
         if(error || success) {
             error.classList.remove('modal-open');
             success.classList.remove('modal-open');
-            location.reload()
+           
         }
         
       }
