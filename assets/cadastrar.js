@@ -59,10 +59,5 @@ document.getElementById('presencaForm').addEventListener('submit', (event) => {
     const nome = document.getElementById('nome').value;
     const confirmar = document.getElementById('confirmar').value;
 
-    if( ! quantidadeDePessoas <= 0) {
-        // Chama a função para enviar os dados para o Airtable
-        enviarPresenca(nome, confirmar);
-    } else {
-        openModal('modalError')
-    }
+    enviarPresenca(nome, confirmar);
 });
