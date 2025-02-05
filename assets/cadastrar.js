@@ -27,13 +27,12 @@ const hideLoading = () => {
 };
 
 // Função para enviar os dados ao Airtable
-const enviarPresenca = async (nome, quantidadeDePessoas, confirmar) => {
+const enviarPresenca = async (nome, confirmar) => {
     showLoading();  // Exibe o spinner de carregamento
     try {
         await axios.post(url, {
             fields: {
                 Nome: nome,
-                "Quantidade de pessoas": quantidadeDePessoas,
                 "Confirma presença?": confirmar,
             }
         }, {
@@ -48,7 +47,6 @@ const enviarPresenca = async (nome, quantidadeDePessoas, confirmar) => {
         openModal('modalSuccess'); // Mostra o modal de sucesso
     } catch (error) {
         hideLoading();  // Esconde o spinner
-        console.log(quantidadeDePessoas);
         console.error('Erro ao enviar os dados:', error);
         openModal('modalError'); // Mostra o modal de erro
     }
@@ -59,12 +57,11 @@ document.getElementById('presencaForm').addEventListener('submit', (event) => {
     event.preventDefault();
 
     const nome = document.getElementById('nome').value;
-    const quantidadeDePessoas = document.getElementById('quantidade').value;
     const confirmar = document.getElementById('confirmar').value;
 
     if( ! quantidadeDePessoas <= 0) {
         // Chama a função para enviar os dados para o Airtable
-        enviarPresenca(nome, quantidadeDePessoas, confirmar);
+        enviarPresenca(nome, confirmar);
     } else {
         openModal('modalError')
     }
