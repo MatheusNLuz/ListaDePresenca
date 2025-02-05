@@ -27,14 +27,13 @@ const hideLoading = () => {
 };
 
 // Função para enviar os dados ao Airtable
-const enviarPresenca = async (nome, quantidadeDePessoas, integrantes, confirmar) => {
+const enviarPresenca = async (nome, quantidadeDePessoas, confirmar) => {
     showLoading();  // Exibe o spinner de carregamento
     try {
         await axios.post(url, {
             fields: {
                 Nome: nome,
                 "Quantidade de pessoas": quantidadeDePessoas,
-                "Nome dos integrantes": integrantes || '',
                 "Confirma presença?": confirmar,
             }
         }, {
@@ -55,16 +54,6 @@ const enviarPresenca = async (nome, quantidadeDePessoas, integrantes, confirmar)
     }
 };
 
-document.getElementById('quantidade').addEventListener('input', () => {    
-    const quantidadeDePessoas = document.getElementById('quantidade').value    
-    const integrantesDiv = document.getElementById('integrantesDiv');
-    if (quantidadeDePessoas >= 2) {
-      integrantesDiv.classList.remove('hidden');  // Exibe o campo
-    } else {
-      integrantesDiv.classList.add('hidden');  // Esconde o campo
-    }
-  });
-
 // Evento de envio do formulário
 document.getElementById('presencaForm').addEventListener('submit', (event) => {
     event.preventDefault();
@@ -72,11 +61,10 @@ document.getElementById('presencaForm').addEventListener('submit', (event) => {
     const nome = document.getElementById('nome').value;
     const quantidadeDePessoas = document.getElementById('quantidade').value;
     const confirmar = document.getElementById('confirmar').value;
-    const integrantes = document.getElementById('integrantes').value;
 
     if( ! quantidadeDePessoas <= 0) {
         // Chama a função para enviar os dados para o Airtable
-        enviarPresenca(nome, quantidadeDePessoas, integrantes, confirmar);
+        enviarPresenca(nome, quantidadeDePessoas, confirmar);
     } else {
         openModal('modalError')
     }
