@@ -27,13 +27,15 @@ const hideLoading = () => {
 };
 
 // Função para enviar os dados ao Airtable
-const enviarPresenca = async (nome, confirmar) => {
+const enviarPresenca = async (nome, quantidadeDePessoas, integrantes, confirmar) => {
     showLoading();  // Exibe o spinner de carregamento
     try {
         await axios.post(url, {
             fields: {
                 Nome: nome,
-                "Confirma presença?": confirmar
+                "Quantidade de pessoas": quantidadeDePessoas,
+                "Nome dos integrantes": integrantes || '',
+                "Confirma presença?": confirmar,
             }
         }, {
             headers: {
@@ -41,22 +43,41 @@ const enviarPresenca = async (nome, confirmar) => {
                 'Content-Type': 'application/json'
             }
         });
+        
+        
         hideLoading();  // Esconde o spinner
         openModal('modalSuccess'); // Mostra o modal de sucesso
     } catch (error) {
         hideLoading();  // Esconde o spinner
+        console.log(quantidadeDePessoas);
         console.error('Erro ao enviar os dados:', error);
         openModal('modalError'); // Mostra o modal de erro
     }
 };
+
+document.getElementById('quantidade').addEventListener('input', () => {    
+    const quantidadeDePessoas = document.getElementById('quantidade').value    
+    const integrantesDiv = document.getElementById('integrantesDiv');
+    if (quantidadeDePessoas >= 2) {
+      integrantesDiv.classList.remove('hidden');  // Exibe o campo
+    } else {
+      integrantesDiv.classList.add('hidden');  // Esconde o campo
+    }
+  });
 
 // Evento de envio do formulário
 document.getElementById('presencaForm').addEventListener('submit', (event) => {
     event.preventDefault();
 
     const nome = document.getElementById('nome').value;
+    const quantidadeDePessoas = document.getElementById('quantidade').value;
     const confirmar = document.getElementById('confirmar').value;
+    const integrantes = document.getElementById('integrantes').value;
 
-    // Chama a função para enviar os dados para o Airtable
-    enviarPresenca(nome, confirmar);
+    if( ! quantidadeDePessoas <= 0) {
+        // Chama a função para enviar os dados para o Airtable
+        enviarPresenca(nome, quantidadeDePessoas, integrantes, confirmar);
+    } else {
+        openModal('modalError')
+    }
 });
